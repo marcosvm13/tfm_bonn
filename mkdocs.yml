@@ -1,0 +1,13 @@
+site_name: "BONN: Bio-Inspired Olfactory Neural Network"
+
+theme:
+  name: mkdocs
+  palette:
+    primary: blue
+    accent: indigo
+
+nav:
+  - Inicio: index.md
+  - Instalación: installation.md
+  - Uso: usage.md
+  - Detalles Técnicos: technical.md

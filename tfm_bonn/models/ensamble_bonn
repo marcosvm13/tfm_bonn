@@ -1,0 +1,83 @@
+import cupy as np
+import numpy as npi
+from scipy.special import softmax
+from sklearn.metrics import accuracy_score
+
+
+class EnsembleBONN:
+    """
+    Clase que representa un ensamble de modelos BONN entrenados de forma independiente.
+    """
+
+    def __init__(self, fit_fn, hidden_layer_mult=3, pc=0.1, s=0.01, n_classes=10):
+        """
+        Inicializa el ensamble con los hiperparámetros comunes a todos los modelos.
+
+        Parámetros:
+        - fit_fn: función de entrenamiento que devuelve un modelo BONN.
+        - hidden_layer_mult: multiplicador de la capa oculta.
+        - pc: parámetro de conectividad.
+        - s: parámetro de actividad.
+        - n_classes: número de clases para la predicción.
+        """
+        self.fit_fn = fit_fn
+        self.hidden_layer_mult = hidden_layer_mult
+        self.pc = pc
+        self.s = s
+        self.n_classes = n_classes
+
+    def predict_with_ensemble(self, X_test, n_models):
+        """
+        Predice usando un ensamble de n modelos BONN.
+
+        Parámetros:
+        - X_test: datos de prueba (array de CuPy).
+        - n_models: número de modelos del ensamble.
+
+        Devuelve:
+        - pred_probs: probabilidades promedio predichas por el ensamble.
+        """
+        pred_probs = npi.zeros((len(X_test), self.n_classes))
+
+        for _ in range(n_models):
+            model, *_ = self.fit_fn(
+                seed=None,
+                batch_size=64,
+                etapas=1,
+                wtrain="n",
+                verbose=False,
+                reg=True,
+                lr=0.1,
+                cte=100,
+                act="sigmoid",
+                reg_method=["mse"],
+                bias_method="adaptive_scaling",
+                pc_method="constant",
+                hidden_layer_mult=self.hidden_layer_mult,
+                pc=self.pc,
+                s=self.s
+            )
+            logits = model.predict(np.array(X_test))
+            probs = softmax(logits, axis=1)
+            pred_probs += probs
+
+        return pred_probs / n_models
+
+    def evaluate_ensemble(self, X_test, y_test, ensemble_sizes):
+        """
+        Evalúa la precisión del ensamble con diferentes tamaños.
+
+        Devuelve:
+        - accuracies: lista de precisiones por tamaño de ensamble.
+        """
+        accuracies = []
+
+        for n_models in ensemble_sizes:
+            print(f"Entrenando ensamble con {n_models} modelos...")
+            pred_probs = self.predict_with_ensemble(X_test, n_models)
+            y_pred = npi.argmax(pred_probs, axis=1)
+            acc = accuracy_score(npi.argmax(y_test.get(), axis=1), y_pred)
+            accuracies.append(acc)
+            print(f"Accuracy con {n_models} modelos: {acc:.4f}")
+
+        return accuracies

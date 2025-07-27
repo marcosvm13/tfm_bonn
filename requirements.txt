@@ -1,0 +1,11 @@
+torch>=2.0
+torchvision
+cupy-cuda12x
+numpy
+scipy
+pandas
+scikit-learn
+matplotlib
+seaborn
+pygments 
+tqdm  
