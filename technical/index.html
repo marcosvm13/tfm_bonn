@@ -82,29 +82,33 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#detalles-tecnicos-de-bonn" class="nav-link">Detalles Técnicos de BONN</a>
+            <li class="nav-item" data-bs-level="1"><a href="#documentacion-tecnica-del-proyecto-bonn" class="nav-link">Documentación Técnica del Proyecto BONN</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#arquitectura-bonn" class="nav-link">Arquitectura BONN</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#gatebonn-version-bayesiana" class="nav-link">GateBONN (versión bayesiana)</a>
+            <li class="nav-item" data-bs-level="2"><a href="#1-arquitectura-bonn" class="nav-link">1. Arquitectura BONN</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#ensamble-bonn" class="nav-link">Ensamble BONN</a>
+            <li class="nav-item" data-bs-level="2"><a href="#2-gatebonn-version-bayesiana-con-compuertas" class="nav-link">2. GateBONN (versión bayesiana con compuertas)</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#experimentos" class="nav-link">Experimentos</a>
+            <li class="nav-item" data-bs-level="2"><a href="#3-ensemblebonn" class="nav-link">3. EnsembleBONN</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#entradas-y-salidas" class="nav-link">Entradas y salidas</a>
+            <li class="nav-item" data-bs-level="2"><a href="#4-experimentos-y-evaluacion" class="nav-link">4. Experimentos y Evaluación</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#codigo-gpu" class="nav-link">Código GPU</a>
+            <li class="nav-item" data-bs-level="2"><a href="#5-entradas-y-salidas" class="nav-link">5. Entradas y Salidas</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#6-implementacion-tecnica" class="nav-link">6. Implementación técnica</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#7-requisitos" class="nav-link">7. Requisitos</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -115,54 +119,105 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="detalles-tecnicos-de-bonn">Detalles Técnicos de BONN</h1>
-<p>Este proyecto implementa modelos inspirados en el sistema olfativo de los insectos, centrado en arquitecturas con:</p>
+<h1 id="documentacion-tecnica-del-proyecto-bonn">Documentación Técnica del Proyecto BONN</h1>
+<p>Este repositorio implementa modelos bioinspirados en el sistema olfativo de los insectos, enfocados en tareas de clasificación con pocos datos. Las arquitecturas propuestas reproducen mecanismos funcionales clave del procesamiento sensorial en <em>Drosophila melanogaster</em>, como la codificación dispersa, la especialización funcional y la robustez estructural.</p>
+<h2 id="1-arquitectura-bonn">1. Arquitectura BONN</h2>
+<p>BONN (Bio-inspired Olfactory Neural Network) simula la vía sensorial AL → KC → MBON. Su estructura consta de:</p>
 <ul>
-<li><strong>Proyecciones aleatorias parcialmente estructuradas</strong></li>
-<li><strong>Codificación dispersa (sparse coding)</strong></li>
-<li><strong>Especialización funcional</strong></li>
-<li><strong>Aprendizaje superficial (shallow learning)</strong></li>
+<li><strong>Proyecciones fijas desde AL a KC</strong>: Representadas mediante matrices de conexión binarias, dispersas y parcialmente estructuradas. Esta matriz se inicializa una única vez al comienzo y no se entrena.</li>
+<li>
+<p><strong>Codificación dispersa</strong>: Controlada mediante dos hiperparámetros:</p>
+</li>
+<li>
+<p><code>s</code>: tasa de activación objetivo para cada entrada.</p>
+</li>
+<li><code>pc</code>: probabilidad de conexión de cada neurona de KC con entradas del AL.</li>
+<li><strong>Salida entrenable (MBON)</strong>: Una única capa lineal entrenada con descenso por gradiente.</li>
+<li><strong>Función de activación</strong>: Sigmoide o variantes suaves, usada para mantener la interpretabilidad de las tasas de activación.</li>
 </ul>
-<h2 id="arquitectura-bonn">Arquitectura BONN</h2>
+<p>La implementación principal está escrita en CuPy para acelerar la ejecución mediante operaciones vectorizadas en GPU. El uso de máscaras binarias permite simular la conectividad estructural AL→KC de forma eficiente.</p>
+<h2 id="2-gatebonn-version-bayesiana-con-compuertas">2. GateBONN (versión bayesiana con compuertas)</h2>
+<p>GateBONN extiende BONN incorporando mecanismos bayesianos de control de activación:</p>
 <ul>
-<li>Proyección fija: AL → KC (capa de expansión)</li>
-<li>Aprendizaje: capa lineal de salida (MBON)</li>
-<li>Activaciones: funciones tipo sigmoide y control de escasez por parámetros <code>s</code>, <code>pc</code></li>
+<li><strong>Compuertas estocásticas diferenciables</strong>: Se utiliza la relajación de Gumbel-Sigmoid para permitir el paso de gradientes en compuertas binarias.</li>
+<li><strong>Distribuciones beta</strong>: Cada compuerta tiene una distribución Beta con parámetros aprendidos. Esto permite modelar explícitamente la probabilidad de activación de cada neurona.</li>
+<li><strong>Regularización por divergencia KL</strong>: Se añade un término en la función de pérdida que penaliza desviaciones respecto a un prior Beta, promoviendo escasez y control de entropía.</li>
+<li><strong>Cálculo de información mutua</strong>: Se estima la dependencia entre las activaciones internas y las clases objetivo usando un término tipo InfoNCE o una medida basada en codificación cruzada.</li>
 </ul>
-<h2 id="gatebonn-version-bayesiana">GateBONN (versión bayesiana)</h2>
+<p>Este modelo está implementado completamente en PyTorch, aprovechando su compatibilidad con autograd y su ecosistema de entrenamiento distribuido.</p>
+<h2 id="3-ensemblebonn">3. EnsembleBONN</h2>
 <ul>
-<li>Implementado en PyTorch</li>
-<li>Gating estocástico usando relajación Gumbel-Sigmoid</li>
-<li>Regularización KL con distribución Beta</li>
-<li>Estimación de información mutua entre activación y etiquetas</li>
+<li><strong>Agregación de modelos BONN independientes</strong>: Se generan múltiples instancias de BONN con distintas inicializaciones estructurales (máscaras de conexión).</li>
+<li><strong>Votación suave (soft voting)</strong>: Las salidas de cada modelo se combinan promediando las probabilidades clase a clase.</li>
+<li><strong>Evaluación progresiva</strong>: Se mide cómo mejora la precisión del conjunto a medida que se agregan modelos, desde 1 hasta 100.</li>
+<li><strong>Motivación biológica</strong>: Refleja la diversidad funcional de subpoblaciones KCs en el MB (α, β, γ).</li>
 </ul>
-<h2 id="ensamble-bonn">Ensamble BONN</h2>
+<h2 id="4-experimentos-y-evaluacion">4. Experimentos y Evaluación</h2>
+<p>Se han llevado a cabo varios experimentos para validar el rendimiento y las propiedades internas de BONN y sus variantes:</p>
 <ul>
-<li>Múltiples modelos entrenados independientemente</li>
-<li>Predicción promedio de sus salidas (softmax)</li>
-<li>Evaluación de precisión según tamaño del ensamble</li>
+<li><strong>Comparación con modelos clásicos</strong>: Se comparan BONN, GateBONN y EnsembleBONN con MLP, ELM y RFM bajo entrenamiento superficial (una época).</li>
+<li><strong>Fast learning</strong>: Evaluación de precisión en función del número de muestras de entrenamiento, desde 1 hasta 10k.</li>
+<li><strong>Pruning sin reentrenamiento</strong>: Evaluación de robustez al eliminar un porcentaje creciente de neuronas ocultas sin volver a entrenar.</li>
+<li><strong>Especialización funcional</strong>: Análisis de la proporción de KCs especialistas y generalistas a través de métricas basadas en la sensibilidad por clase.</li>
+<li><strong>Multimodalidad de activaciones</strong>: Se estudia la distribución del número efectivo de clases que activan cada KC, buscando indicios de subpoblaciones funcionales diferenciadas.</li>
 </ul>
-<h2 id="experimentos">Experimentos</h2>
+<h2 id="5-entradas-y-salidas">5. Entradas y Salidas</h2>
 <ul>
-<li>Comparación con MLP, RFM y ELM</li>
-<li>Robustez ante pruning sin reentrenamiento</li>
-<li>Medida de multimodalidad en activación de KCs</li>
-<li>Eficiencia en escenarios de pocos datos</li>
+<li><strong>Datos</strong>: MNIST (grises, 28×28 píxeles, 10 clases).</li>
+<li><strong>Preprocesamiento</strong>: Flatten + normalización a [0, 1].</li>
+<li><strong>Entrada del modelo</strong>: vectores de 784 dimensiones.</li>
+<li><strong>Salida del modelo</strong>: logits (10 dimensiones), convertidos a probabilidades vía softmax.</li>
+<li><strong>Métricas</strong>: accuracy, sparsity media, especialización funcional, robustez al pruning.</li>
 </ul>
-<h2 id="entradas-y-salidas">Entradas y salidas</h2>
+<h2 id="6-implementacion-tecnica">6. Implementación técnica</h2>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Librería</th>
+<th>Detalles técnicos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BONN</td>
+<td>CuPy</td>
+<td>Máscaras binarias, operaciones vectorizadas en GPU</td>
+</tr>
+<tr>
+<td>GateBONN</td>
+<td>PyTorch</td>
+<td>Uso de <code>torch.distributions.Beta</code>, <code>RelaxedBernoulli</code>, <code>nn.Module</code></td>
+</tr>
+<tr>
+<td>Pruning</td>
+<td>NumPy / CuPy</td>
+<td>Eliminación de neuronas según índice</td>
+</tr>
+<tr>
+<td>Visualización</td>
+<td>Matplotlib</td>
+<td>Histogramas de especialización, evolución de precisión</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ficheros-clave">Ficheros clave</h3>
 <ul>
-<li>Datos: MNIST</li>
-<li>Entrada: vectores 784-D normalizados</li>
-<li>Salida: logits o probabilidades sobre 10 clases</li>
+<li><code>bonn.py</code>: clase BONN (CuPy)</li>
+<li><code>gatebonn.py</code>: clase GateBONN (PyTorch)</li>
+<li><code>ensemble.py</code>: funciones para crear y evaluar ensambles</li>
+<li><code>experiments/</code>: scripts de evaluación rápida, pruning y análisis interno</li>
+<li><code>utils/</code>: funciones de activación, inicialización y análisis de activaciones</li>
 </ul>
-<h2 id="codigo-gpu">Código GPU</h2>
-<ul>
-<li>BONN: usa CuPy para operaciones vectorizadas</li>
-<li>GateBONN: usa PyTorch con GPU</li>
-<li>Pruning, análisis y visualizaciones compatibles con NumPy o CuPy</li>
-</ul>
+<h2 id="7-requisitos">7. Requisitos</h2>
+<pre><code class="language-bash">cupy&gt;=11.0.0
+torch&gt;=2.0.0
+matplotlib
+scikit-learn
+scipy
+</code></pre>
 <hr />
-<p>Para más detalles conceptuales, consulta el capítulo de desarrollo del TFM.</p></div>
+<p>Para un análisis más detallado del marco conceptual, referirse al Capítulo de Desarrollo del TFM. Allí se explican las motivaciones biológicas, las propiedades funcionales y los resultados experimentales con referencias cruzadas entre secciones.</p></div>
             </div>
         </div>
 

@@ -82,13 +82,17 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#bonn-bio-inspired-olfactory-neural-networks" class="nav-link">BONN: Bio-inspired Olfactory Neural Networks</a>
+            <li class="nav-item" data-bs-level="1"><a href="#bonn-redes-neuronales-eficientes-para-aprendizaje-rapido" class="nav-link">BONN: Redes Neuronales Eficientes para Aprendizaje Rápido</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#contenido-principal" class="nav-link">Contenido principal</a>
+            <li class="nav-item" data-bs-level="2"><a href="#caracteristicas-destacadas" class="nav-link">Características destacadas</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#estructura-del-repositorio" class="nav-link">Estructura del repositorio</a>
+            <li class="nav-item" data-bs-level="2"><a href="#modelos-incluidos" class="nav-link">Modelos incluidos</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#estructura-del-proyecto" class="nav-link">Estructura del proyecto</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -103,24 +107,40 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="bonn-bio-inspired-olfactory-neural-networks">BONN: Bio-inspired Olfactory Neural Networks</h1>
-<p>Este proyecto implementa y analiza una familia de modelos de redes neuronales artificiales inspirados en el sistema olfativo de los insectos. Los modelos, como BONN y GateBONN, están diseñados para ser eficientes en entornos de aprendizaje rápido y con recursos limitados, emulando principios como codificación dispersa, especialización funcional y robustez estructural.</p>
-<h2 id="contenido-principal">Contenido principal</h2>
+<p>Perfecto. Aquí tienes una versión más sobria, profesional y llamativa del resumen inicial del proyecto BONN, sin iconos ni referencias explícitas al dataset o a la inspiración biológica, pero con un tono atractivo y técnico:</p>
+<hr />
+<h1 id="bonn-redes-neuronales-eficientes-para-aprendizaje-rapido">BONN: Redes Neuronales Eficientes para Aprendizaje Rápido</h1>
+<p><strong>BONN (Bio-inspired Olfactory Neural Network)</strong> es una arquitectura diseñada para entornos donde la eficiencia, la rapidez de entrenamiento y la robustez son prioritarias. Frente a los modelos tradicionales, BONN ofrece una alternativa ligera y altamente competitiva en escenarios de clasificación con pocos datos y entrenamiento superficial.</p>
+<p>Este repositorio implementa y analiza una familia de modelos que combinan conectividad estructurada fija con mecanismos de activación controlada, obteniendo representaciones internas especializadas sin necesidad de múltiples capas entrenables.</p>
+<hr />
+<h2 id="caracteristicas-destacadas">Características destacadas</h2>
 <ul>
-<li>Definición de modelos bioinspirados (BONN, GateBONN, ELM, RFM)</li>
-<li>Experimentación sobre capacidad de generalización, escasez, robustez y aprendizaje rápido</li>
-<li>Comparativas frente a MLPs tradicionales</li>
-<li>Evaluación de técnicas como pruning, ensambles y codificación aleatoria</li>
+<li>Arquitectura con una sola capa entrenable y conexiones fijas.</li>
+<li>Entrenamiento eficiente: convergencia en una única época.</li>
+<li>Codificación dispersa y representaciones especializadas emergentes.</li>
+<li>Alta tolerancia al pruning sin necesidad de reentrenamiento.</li>
+<li>Extensiones con activación estocástica y agregación estructurada.</li>
 </ul>
-<h2 id="estructura-del-repositorio">Estructura del repositorio</h2>
+<hr />
+<h2 id="modelos-incluidos">Modelos incluidos</h2>
+<ul>
+<li><code>BONN</code>: Modelo base con proyecciones aleatorias fijas y salida entrenable.</li>
+<li><code>GateBONN</code>: Variante con compuertas estocásticas diferenciables y regularización bayesiana.</li>
+<li><code>EnsembleBONN</code>: Combinación de múltiples instancias independientes para mejorar estabilidad y precisión.</li>
+<li>Comparativas con modelos de referencia: <code>MLP</code>, <code>ELM</code>, <code>RFM</code>.</li>
+</ul>
+<hr />
+<h2 id="estructura-del-proyecto">Estructura del proyecto</h2>
 <pre><code class="language-bash">src/
-├── bonn/              # Definición de arquitectura BONN
-├── gatebonn/          # Modelo GateBONN en PyTorch
-├── analysis/          # Métricas, gráficos y análisis
-├── training/          # Funciones de entrenamiento y validación
-├── experiments/       # Scripts de evaluación y benchmarking
-└── app.py             # Script principal de ejecución centralizada
+├── bonn/              # Arquitectura principal BONN
+├── gatebonn/          # GateBONN: versión con activación estocástica
+├── ensemble/          # Lógica de ensamble y agregación
+├── training/          # Entrenamiento, validación y evaluación
+├── analysis/          # Visualización de activaciones, escasez y especialización
+├── experiments/       # Scripts para ejecución de experimentos controlados
+└── app.py             # Punto de entrada para lanzar entrenamientos
 </code></pre>
+<hr />
 <h2 id="documentacion">Documentación</h2>
 <ul>
 <li><a href="installation/">Installation</a>: Cómo instalar y configurar el entorno</li>
@@ -208,5 +228,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-07-27 10:36:51.805796+00:00
+Build Date UTC : 2025-07-27 10:46:13.844147+00:00
 -->
